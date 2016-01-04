@@ -189,6 +189,7 @@ static void od_check_cpu(int cpu, unsigned int load)
 			dbs_info->rate_mult =
 				od_tuners->sampling_down_factor;
 		dbs_freq_increase(policy, policy->max);
+<<<<<<< HEAD
 	} else {
 		/* Calculate the next frequency proportional to load */
 		unsigned int freq_next, min_f, max_f;
@@ -196,6 +197,13 @@ static void od_check_cpu(int cpu, unsigned int load)
 		min_f = policy->cpuinfo.min_freq;
 		max_f = policy->cpuinfo.max_freq;
 		freq_next = min_f + load * (max_f - min_f) / 100;
+=======
+		return;
+	} else {
+		/* Calculate the next frequency proportional to load */
+		unsigned int freq_next;
+		freq_next = load * policy->cpuinfo.max_freq / 100;
+>>>>>>> b2adbe9... linux 3.10.57
 
 		/* No longer fully busy, reset rate_mult */
 		dbs_info->rate_mult = 1;
