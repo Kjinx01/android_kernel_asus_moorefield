@@ -792,7 +792,11 @@ long join_session_keyring(const char *name)
 		ret = PTR_ERR(keyring);
 		goto error2;
 	} else if (keyring == new->session_keyring) {
+<<<<<<< HEAD
                 key_put(keyring);
+=======
+		key_put(keyring);
+>>>>>>> 5d7c6b5... Linux 3.10.95
 		ret = 0;
 		goto error2;
 	}
