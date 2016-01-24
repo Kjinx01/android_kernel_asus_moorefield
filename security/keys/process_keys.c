@@ -793,10 +793,14 @@ long join_session_keyring(const char *name)
 		goto error2;
 	} else if (keyring == new->session_keyring) {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 key_put(keyring);
 =======
 		key_put(keyring);
 >>>>>>> 5d7c6b5... Linux 3.10.95
+=======
+                key_put(keyring);
+>>>>>>> 347de1d...  KEYS: Fix keyring ref leak in join_session_keyring()
 		ret = 0;
 		goto error2;
 	}
