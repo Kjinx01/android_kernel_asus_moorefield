@@ -1,10 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-<<<<<<< HEAD
-# Linux/x86 3.10.20 Kernel Configuration
-=======
 # Linux/x86_64 3.10.20_FlareM_v9 Kernel Configuration
->>>>>>> 359c894... Regenerate defconfig
 #
 CONFIG_64BIT=y
 CONFIG_X86_64=y
