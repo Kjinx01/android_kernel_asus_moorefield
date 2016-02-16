@@ -654,10 +654,10 @@ int setup_arg_pages(struct linux_binprm *bprm,
 	unsigned long rlim_stack;
 
 #ifdef CONFIG_STACK_GROWSUP
-	/* Limit stack size */
+	/* Limit stack size to 1GB */
 	stack_base = rlimit_max(RLIMIT_STACK);
-	if (stack_base > STACK_SIZE_MAX)
-		stack_base = STACK_SIZE_MAX;
+	if (stack_base > (1 << 30))
+		stack_base = 1 << 30;
 
 	/* Make sure we didn't let the argument array grow too large. */
 	if (vma->vm_end - vma->vm_start > stack_base)
@@ -1269,8 +1269,8 @@ static void bprm_fill_uid(struct linux_binprm *bprm)
 {
 	struct inode *inode;
 	unsigned int mode;
-	kuid_t uid;
-	kgid_t gid;
+	uid_t uid;
+	gid_t gid;
 
 	/* clear any previous set[ug]id data from a previous binary */
 	bprm->cred->euid = current_euid();
@@ -1279,10 +1279,7 @@ static void bprm_fill_uid(struct linux_binprm *bprm)
 	if (bprm->file->f_path.mnt->mnt_flags & MNT_NOSUID)
 		return;
 
-	if (current->no_new_privs)
-		return;
-
-	inode = file_inode(bprm->file);
+	inode = bprm->file->f_path.dentry->d_inode;
 	mode = ACCESS_ONCE(inode->i_mode);
 	if (!(mode & (S_ISUID|S_ISGID)))
 		return;
@@ -1295,11 +1292,6 @@ static void bprm_fill_uid(struct linux_binprm *bprm)
 	uid = inode->i_uid;
 	gid = inode->i_gid;
 	mutex_unlock(&inode->i_mutex);
-
-	/* We ignore suid/sgid if there are no mappings for them in the ns */
-	if (!kuid_has_mapping(bprm->cred->user_ns, uid) ||
-		 !kgid_has_mapping(bprm->cred->user_ns, gid))
-		return;
 
 	if (mode & S_ISUID) {
 		bprm->per_clear |= PER_CLEAR_ON_SETID;
@@ -1689,12 +1681,6 @@ int __get_dumpable(unsigned long mm_flags)
 	return (ret > SUID_DUMP_USER) ? SUID_DUMP_ROOT : ret;
 }
 
-/*
- * This returns the actual value of the suid_dumpable flag. For things
- * that are using this for checking for privilege transitions, it must
- * test against SUID_DUMP_USER rather than treating it as a boolean
- * value.
- */
 int get_dumpable(struct mm_struct *mm)
 {
 	return __get_dumpable(mm->flags);
