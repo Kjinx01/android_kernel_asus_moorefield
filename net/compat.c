@@ -79,7 +79,7 @@ int get_compat_msghdr(struct msghdr *kmsg, struct compat_msghdr __user *umsg)
 		return -EINVAL;
 
 	if (kmsg->msg_namelen > sizeof(struct sockaddr_storage))
-		return -EINVAL;
+		kmsg->msg_namelen = sizeof(struct sockaddr_storage);
 	kmsg->msg_name = compat_ptr(tmp1);
 	kmsg->msg_iov = compat_ptr(tmp2);
 	kmsg->msg_control = compat_ptr(tmp3);
@@ -101,8 +101,10 @@ int verify_compat_iovec(struct msghdr *kern_msg, struct iovec *kern_iov,
 				return err;
 		}
 		kern_msg->msg_name = kern_address;
-	} else
+	} else {
 		kern_msg->msg_name = NULL;
+		kern_msg->msg_namelen = 0;
+	}
 
 	tot_len = iov_from_user_compat_to_kern(kern_iov,
 					  (struct compat_iovec __user *)kern_msg->msg_iov,
